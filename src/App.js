@@ -216,12 +216,14 @@ class App extends Component {
                 <Card>
                   <CardHeader className="d-flex justify-content-between align-items-center">
                     Game ID: { game.id }
-                    <Button onClick={() => this.joinGame(game.id, this.state.currentPlayer)}>
-                      Join Game
-                    </Button>
-                    <Button onClick={() => this.deleteGame(game.id)}>
-                      Delete
-                    </Button>
+                    <div>
+                      <Button onClick={() => this.joinGame(game.id, this.state.currentPlayer)}>
+                        Join Game
+                      </Button>
+                      <Button onClick={() => this.deleteGame(game.id)} style={{ marginLeft: 10 }}>
+                        Delete
+                      </Button>
+                    </div>
                   </CardHeader>
                   <CardBody>
                     <CardTitle>Players:</CardTitle>
