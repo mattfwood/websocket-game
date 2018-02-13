@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "bootstrap": "^4.0.0",
+    "haikunator": "^2.0.0",
     "prop-types": "^15.6.0",
     "re-base": "2.2.0",
     "react": "^16.2.0",

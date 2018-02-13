@@ -9,6 +9,9 @@ import Level from './Level';
 import Player from './Player';
 import shortid from 'shortid';
 
+const Haikunator = require('haikunator');
+const haikunator = new Haikunator();
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -25,6 +28,12 @@ class App extends Component {
     this.ref = base.syncState('players', {
       context: this,
       state: 'players',
+      asArray: true
+    });
+
+    this.ref = base.syncState('games', {
+      context: this,
+      state: 'games',
       asArray: true
     });
 
@@ -143,7 +152,7 @@ class App extends Component {
 
   createGame = (creator) => {
     const { games } = this.state;
-    const id = shortid.generate();
+    const id = haikunator.haikunate({tokenLength: 0, delimiter: ' '});
 
     games.push({
       id,
@@ -155,11 +164,27 @@ class App extends Component {
     this.setState({ games });
   }
 
-  deleteGame = (id) => {
+  joinGame = (gameId, playerId) => {
+    let { games } = this.state;
+
+    games = games.map(game => {
+      if (game.id === gameId) {
+        // add player to matching game
+        game.players.push({ id: playerId });
+        return game;
+      }
+      // else return game
+      return game;
+    });
+
+    this.setState({ games });
+  }
+
+  deleteGame = (gameId) => {
     let { games } = this.state;
 
     games = games.filter(game => {
-      return game.id !== id;
+      return game.id !== gameId;
     });
 
     this.setState({ games });
@@ -189,7 +214,15 @@ class App extends Component {
             this.state.games.map(game => {
               return (
                 <Card>
-                  <CardHeader className="d-flex justify-content-between align-items-center">Game ID: { game.id } <Button onClick={() => this.deleteGame(game.id)}>Delete Game</Button></CardHeader>
+                  <CardHeader className="d-flex justify-content-between align-items-center">
+                    Game ID: { game.id }
+                    <Button onClick={() => this.joinGame(game.id, this.state.currentPlayer)}>
+                      Join Game
+                    </Button>
+                    <Button onClick={() => this.deleteGame(game.id)}>
+                      Delete
+                    </Button>
+                  </CardHeader>
                   <CardBody>
                     <CardTitle>Players:</CardTitle>
                     {
