@@ -1,0 +1,28 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.level-container {
+  width: 500px;
+  height: 500px;
+  /* border: 1px solid #000; */
+  /* position: relative; */
+  /* overflow: hidden; */
+}
+
+.player {
+  height: 25px;
+  width: 25px;
+  position: absolute;
+  border: 1px solid #000;
+}
