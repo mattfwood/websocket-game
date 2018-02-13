@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import './App.css';
 
-import KeyHandler, { KEYPRESS } from 'react-key-handler';
+// import KeyHandler, { KEYPRESS } from 'react-key-handler';
 import { Button, ListGroup, ListGroupItem, Card, CardHeader, CardBody, CardTitle, CardText } from 'reactstrap';
 
 import base from './base';
 import Level from './Level';
-import Player from './Player';
+// import Player from './Player';
 import shortid from 'shortid';
 
 const Haikunator = require('haikunator');
@@ -41,11 +41,7 @@ class App extends Component {
 
     this.setState({ currentPlayer: id });
 
-    const gameId = window.localStorage.getItem('websocket-game-id');
-
-    // if (!gameId) {
-    //   // add new player
-    // }
+    // const gameId = window.localStorage.getItem('websocket-game-id');
 
     const { players, currentPlayer } = this.state;
 
@@ -58,7 +54,7 @@ class App extends Component {
     if (playerActive.length === 0) {
       console.log('no active players');
 
-      var addPlayer = base.push('players', {
+      base.push('players', {
         data: {
           id,
           position: {
