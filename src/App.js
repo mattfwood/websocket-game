@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import './App.css';
 
 // import KeyHandler, { KEYPRESS } from 'react-key-handler';
@@ -8,6 +9,7 @@ import base from './base';
 import Level from './Level';
 // import Player from './Player';
 import shortid from 'shortid';
+import { Link } from 'react-router-dom';
 
 const Haikunator = require('haikunator');
 const haikunator = new Haikunator();
@@ -16,139 +18,16 @@ class App extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      currentPlayer: '',
-      players: [],
-      games: []
-    };
-  }
-
-  componentWillMount() {
-    // this runs right before <App> is rendered
-    this.ref = base.syncState('players', {
-      context: this,
-      state: 'players',
-      asArray: true
-    });
-
-    this.ref = base.syncState('games', {
-      context: this,
-      state: 'games',
-      asArray: true
-    });
-
-    const id = shortid.generate();
-
-    this.setState({ currentPlayer: id });
-
-    // const gameId = window.localStorage.getItem('websocket-game-id');
-
-    const { players, currentPlayer } = this.state;
-
-    const playerActive = players.filter(player => {
-      return player.id === currentPlayer;
-    });
-
-    console.log(this.state);
-
-    if (playerActive.length === 0) {
-      console.log('no active players');
-
-      base.push('players', {
-        data: {
-          id,
-          position: {
-            top: 0,
-            left: 0
-          }
-        },
-        then(err) {
-          if (!err) {
-            console.log('new player posted');
-          }
-        }
-      });
-    }
-  }
-
-  componentDidMount() {
-    // const { players, currentPlayer } = this.state;
-
-    // console.log(currentPlayer);
-
-    // const playerActive = players.filter(player => {
-    //   return player.id = currentPlayer
-    // });
-
-    // console.log(playerActive);
-
-    // if (playerActive.length === 0) {
-    //   console.log('no active players');
-    //   players.push({
-    //     id: currentPlayer,
-    //     position: {
-    //       top: 0,
-    //       left: 0
-    //     }
-    //   });
-
-    //   this.setState({ players });
-    // }
-
-    // console.log(playerActive);
-  }
-
-  moveLeft = () => {
-    const { players, currentPlayer } = this.state;
-
-    const activePlayerIndex = players.findIndex(player => {
-      return player.id === currentPlayer;
-    });
-
-    players[activePlayerIndex].position.left -= 10;
-
-    this.setState({ players });
-  }
-
-  moveRight = () => {
-    const { players, currentPlayer } = this.state;
-
-    const activePlayerIndex = players.findIndex(player => {
-      return player.id === currentPlayer;
-    });
-
-    players[activePlayerIndex].position.left += 10;
-
-    this.setState({ players });
-  }
-
-  moveUp = () => {
-    const { players, currentPlayer } = this.state;
-
-    const activePlayerIndex = players.findIndex(player => {
-      return player.id === currentPlayer;
-    });
-
-    players[activePlayerIndex].position.top -= 10;
-
-    this.setState({ players });
-  }
-
-  moveDown = () => {
-    const { players, currentPlayer } = this.state;
-
-    const activePlayerIndex = players.findIndex(player => {
-      return player.id === currentPlayer;
-    });
-
-    players[activePlayerIndex].position.top += 10;
-
-    this.setState({ players });
+    // this.state = {
+    //   currentPlayer: '',
+    //   players: [],
+    //   games: []
+    // };
   }
 
   createGame = (creator) => {
     const { games } = this.state;
-    const id = haikunator.haikunate({tokenLength: 0, delimiter: ' '});
+    const id = haikunator.haikunate({tokenLength: 0, delimiter: '-'});
 
     games.push({
       id,
@@ -198,7 +77,7 @@ class App extends Component {
           <h5>Players</h5>
           <ListGroup>
             {
-              this.state.players.map(player => {
+              this.props.players.map(player => {
                 return (
                   <ListGroupItem>{ player.id }</ListGroupItem>
                 );
@@ -207,15 +86,17 @@ class App extends Component {
           </ListGroup>
           <h5>Games</h5>
           {
-            this.state.games.map(game => {
+            this.props.games.map(game => {
               return (
                 <Card>
                   <CardHeader className="d-flex justify-content-between align-items-center">
                     Game ID: { game.id }
                     <div>
-                      <Button onClick={() => this.joinGame(game.id, this.state.currentPlayer)}>
+                      <Link to={`/game/${game.id}`}>
+                        <Button>
                         Join Game
-                      </Button>
+                        </Button>
+                      </Link>
                       <Button onClick={() => this.deleteGame(game.id)} style={{ marginLeft: 10 }}>
                         Delete
                       </Button>
@@ -235,12 +116,18 @@ class App extends Component {
               );
             })
           }
-          <Button color="primary" onClick={() => this.createGame(this.state.currentPlayer)}>Create Game</Button>
+          <Button color="primary" onClick={() => this.props.createGame(this.props.currentPlayer)}>Create Game</Button>
         </Level>
         <Button color="primary" onClick={() => this.setState({ players: [] })}>Reset</Button>
       </div>
     );
   }
+}
+
+App.propTypes = {
+  createGame: PropTypes.func,
+  players: PropTypes.array,
+  games: PropTypes.array
 }
 
 export default App;

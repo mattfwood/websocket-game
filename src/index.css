@@ -26,3 +26,13 @@ body {
   position: absolute;
   border: 1px solid #000;
 }
+
+.typeahead {
+  width: 100%;
+}
+
+.typeahead .dropdown-menu {
+  width: 100%;
+  display: block;
+  top: 40px;
+}
