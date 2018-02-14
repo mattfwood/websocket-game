@@ -26,7 +26,7 @@ class Game extends Component {
         return game
       });
   
-      debugger
+      // debugger
     }
 
     // this.props.updateGames(games);
