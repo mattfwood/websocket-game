@@ -5,7 +5,7 @@ import './index.css';
 import registerServiceWorker from './registerServiceWorker';
 
 import shortid from 'shortid';
-import { Button } from 'reactstrap';
+import { Button, Nav, NavbarBrand, NavItem } from 'reactstrap';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 
 import App from './App';
@@ -41,9 +41,18 @@ class Root extends Component {
       asArray: true
     });
 
-    const id = shortid.generate();
+    let id = window.localStorage.getItem('websocket-game-id');
 
-    this.setState({ currentPlayer: id });
+    // if the player has a previous ID stored
+    if (id) {
+      // use that as the state
+      this.setState({ currentPlayer: id });
+    } else {
+      // otherwise generate one, store it and set it
+      id = shortid.generate();
+      window.localStorage.setItem('websocket-game-id', id);
+      this.setState({ currentPlayer: id });
+    }
 
     // const gameId = window.localStorage.getItem('websocket-game-id');
 
@@ -105,9 +114,17 @@ class Root extends Component {
     return (
       <Router>
         <div>
-          <Button onClick={() => this.resetState()}>
-            Reset
-          </Button>
+          <Nav>
+            <NavbarBrand>
+              Your ID: { this.state.currentPlayer }
+            </NavbarBrand>
+            <NavItem>
+              <Button onClick={() => this.resetState()}>
+                Reset
+              </Button>
+            </NavItem>
+          </Nav>
+
           <Route exact path="/" render={() => (
             <div>
               <MainMenu createGame={this.createGame} {...this.state}/>

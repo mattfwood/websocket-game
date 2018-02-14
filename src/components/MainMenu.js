@@ -22,6 +22,7 @@ class MainMenu extends Component {
 
   render() {
     return (
+      <div className="view">
       <Card style={{ width: '400px' }}>
         <CardHeader>
           Main Menu
@@ -62,6 +63,16 @@ class MainMenu extends Component {
           </Button>
         </CardBody>
       </Card>
+      <ListGroup>
+        {
+          this.props.games.map(game => 
+            <ListGroupItem>
+              {game.id}
+            </ListGroupItem>
+          )
+        }
+      </ListGroup>
+      </div>
     );
   }
 }
