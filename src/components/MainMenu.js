@@ -23,55 +23,57 @@ class MainMenu extends Component {
   render() {
     return (
       <div className="view">
-      <Card style={{ width: '400px' }}>
-        <CardHeader>
-          Main Menu
-        </CardHeader>
-        <CardBody>
-          <CardTitle>Find Game</CardTitle>
-          <InputGroup>
-            <Typeahead
-              options={this.props.games.map(game => game.id)}
-              maxVisible={4}
-              onChange={(input) => this.updateInput(input)}
-              onOptionSelected={(value) => this.selectOption(value)}
-              customClasses={{
-                input: 'form-control',
-                results: 'dropdown-menu',
-                listItem: 'dropdown-item'
-              }} />
-            <Link to={`/game/${this.state.input}`} style={{ width: '100%' }}>
-              <Button
-                color="primary"
-                size="lg"
-                // onClick={() => this.props.createGame(this.props.currentPlayer)}
-                style={{ marginTop: '15px' }}
-                block
-              >
-                Join Game
-              </Button>
-            </Link>
-          </InputGroup>
-          <hr />
-          <Button
-            color="primary"
-            size="lg"
-            onClick={() => this.props.createGame(this.props.currentPlayer)}
-            block
-          >
-            Create Game
-          </Button>
-        </CardBody>
-      </Card>
-      <ListGroup>
-        {
-          this.props.games.map(game => 
-            <ListGroupItem>
-              {game.id}
-            </ListGroupItem>
-          )
-        }
-      </ListGroup>
+        <Card style={{ width: '400px' }}>
+          <CardHeader>
+            Main Menu
+          </CardHeader>
+          <CardBody>
+            <CardTitle>Find Game</CardTitle>
+            <InputGroup>
+              <Typeahead
+                options={this.props.games.map(game => game.id)}
+                maxVisible={4}
+                onChange={(input) => this.updateInput(input)}
+                onOptionSelected={(value) => this.selectOption(value)}
+                customClasses={{
+                  input: 'form-control',
+                  results: 'dropdown-menu',
+                  listItem: 'dropdown-item'
+                }} />
+              <Link to={`/game/${this.state.input}`} style={{ width: '100%' }}>
+                <Button
+                  color="primary"
+                  size="lg"
+                  // onClick={() => this.props.createGame(this.props.currentPlayer)}
+                  style={{ marginTop: '15px' }}
+                  block
+                >
+                  Join Game
+                </Button>
+              </Link>
+            </InputGroup>
+            <hr />
+            <Button
+              color="primary"
+              size="lg"
+              onClick={() => this.props.createGame(this.props.currentPlayer)}
+              block
+            >
+              Create Game
+            </Button>
+          </CardBody>
+          <ListGroup>
+            {
+              this.props.games.map(game =>
+                (<Link to={`/game/${game.id}`}> <ListGroupItem>
+                  {game.id}
+                </ListGroupItem>
+                </Link>
+                )
+              )
+            }
+          </ListGroup>
+        </Card>
       </div>
     );
   }

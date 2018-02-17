@@ -8,6 +8,7 @@ import shortid from 'shortid';
 import { Button, Nav, NavbarBrand, NavItem } from 'reactstrap';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 
+import newUser from './helpers/newUser';
 import App from './App';
 import MainMenu from './components/MainMenu';
 import Game from './components/Game';
@@ -49,7 +50,7 @@ class Root extends Component {
       this.setState({ currentPlayer: id });
     } else {
       // otherwise generate one, store it and set it
-      id = shortid.generate();
+      id = newUser(this.state.players);
       window.localStorage.setItem('websocket-game-id', id);
       this.setState({ currentPlayer: id });
     }

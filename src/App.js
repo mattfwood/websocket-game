@@ -69,10 +69,6 @@ class App extends Component {
     console.log(this.state);
     return (
       <div className="App">
-        {/* <KeyHandler keyEventName={KEYPRESS} keyValue="a" onKeyHandle={this.moveLeft} />
-        <KeyHandler keyEventName={KEYPRESS} keyValue="d" onKeyHandle={this.moveRight} />
-        <KeyHandler keyEventName={KEYPRESS} keyValue="w" onKeyHandle={this.moveUp} />
-        <KeyHandler keyEventName={KEYPRESS} keyValue="s" onKeyHandle={this.moveDown} /> */}
         <Level>
           <h5>Players</h5>
           <ListGroup>
@@ -128,6 +124,6 @@ App.propTypes = {
   createGame: PropTypes.func,
   players: PropTypes.array,
   games: PropTypes.array
-}
+};
 
 export default App;

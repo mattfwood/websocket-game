@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import { Button, ListGroup, ListGroupItem, Card, CardHeader, CardBody, CardTitle, CardText } from 'reactstrap';
+import PlayerView from './PlayerView';
 import base from '../base';
+import Rock from '../rock.png';
+import Paper from '../paper.png';
+import Scissors from '../scissors.png';
 
 class Game extends Component {
   constructor(props) {
@@ -10,16 +14,18 @@ class Game extends Component {
       games: [],
       gameState: {
         id: 'game',
-        playerOne: '',
-        playerTwo: ''
+        status: 'lobby',
+        players: []
       }
     };
+
+    this.playerAction = this.playerAction.bind(this);
   }
 
   componentWillMount() {
     this.ref = base.syncState(`gameState/${this.props.match.params.id}`, {
       context: this,
-      state: `gameState`
+      state: 'gameState'
     });
   }
 
@@ -29,7 +35,7 @@ class Game extends Component {
     if (games.length > 0) {
       games = games.map(game => {
         if (game.id === gameId) {
-          debugger
+          ;
           const playerIndex = game.players.findIndex(player => player.id === currentPlayer);
           // if player isn't already in game, add them
           if (playerIndex === -1) {
@@ -46,70 +52,113 @@ class Game extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    // console.log(nextProps);
-    // let { games, currentPlayer } = nextProps;
-    // const gameId = nextProps.match.params.id;
-    // if (games.length > 0) {
-    //   games = games.map(game => {
-    //     if (game.id == gameId) {
-    //       const playerIndex = game.players.findIndex(player => player.id === currentPlayer);
-    //       // if player isn't already in game, add them
-    //       if (playerIndex > -1) {
-    //         game.players.push({ id: currentPlayer });
-    //       } else {
-    //         console.log('player already in game');
-    //       }
-    //       return game;
-    //     }
-    //     return game;
-    //   });
-    //   this.props.updateGames(games);
-    // }
+  startGame = (playerOne, playerTwo) => {
+    const gameId = this.props.match.params.id;
+
+    if (playerOne && playerTwo && gameId) {
+      base.post(`gameState/${gameId}`, {
+        data: {
+          id: gameId,
+          status: 'active',
+          players: [{
+            id: playerOne,
+            status: 'selecting',
+            action: ''
+          },
+          {
+            id: playerTwo,
+            status: 'selecting',
+            action: ''
+          }]
+        },
+        then(err) {
+          if (!err) {
+            console.log('game started');
+          }
+        }
+      });
+    } else {
+      console.log('You need two players to start');
+      alert('Two players required');
+    }
   }
 
-  startGame = (playerOne, playerTwo) => {
-    this.setState({
-      gameState: {
-        id: '12345',
-        playerOne: playerOne,
-        playerTwo: playerTwo
-      }
+  playerReady = (playerIndex) => {
+    const { gameState } = this.state;
+    gameState.players[playerIndex].status = 'ready';
+    this.setState({ gameState });
+  }
+
+  playerAction = (playerIndex, action) => {
+    console.log(playerIndex, action);
+    const { gameState } = this.state;
+    gameState.players[playerIndex].action = action;
+    this.setState({ gameState });
+  }
+
+  resetGame = () => {
+    let { gameState } = this.state;
+    gameState.players = gameState.players.map(player => {
+      player.action = '';
+      player.status = 'selecting';
+      return player;
     });
+
+    this.setState({ gameState });
   }
 
   render() {
-    // const
+    const { status } = this.state.gameState;
     const { games } = this.props;
     const gameId = this.props.match.params.id;
-    const currentGame = games.filter(game => game.id == gameId)[0];
-    console.log(currentGame);
+    const currentGame = games.filter(game => game.id === gameId)[0];
 
-    if (currentGame) {
+    if (currentGame && status !== 'active') {
       return (
         <div className="view">
-          <Card style={{ width: '500px'}}>
+          <Card style={{ width: '500px' }}>
             <CardHeader>
-              { currentGame.id }
+              {currentGame.id}
             </CardHeader>
             <ListGroup>
-              { currentGame && (
+              {currentGame && (
                 currentGame.players.map(player => {
                   return (
-                    <ListGroupItem>{ player.id }</ListGroupItem>
+                    <ListGroupItem>{player.id}</ListGroupItem>
                   );
                 })
               )
               }
             </ListGroup>
-            <Button onClick={() => this.startGame(currentGame.players[0], currentGame.players[1])}>Start Game</Button>
+            <Button onClick={() => this.startGame(currentGame.players[0].id, currentGame.players[1].id)}>Start Game</Button>
+          </Card>
+        </div>
+      );
+    }
+
+    if (currentGame && status === 'active') {
+      return (
+        <div className="view">
+          <Card style={{ width: '500px' }}>
+            <CardHeader>
+              Game Started: {currentGame.id} 
+            </CardHeader>
+            <CardBody>
+              <PlayerView
+                gameState={this.state.gameState}
+                player={this.props.currentPlayer}
+                playerReady={this.playerReady}
+                playerAction={this.playerAction}
+                resetGame={this.resetGame}
+              />
+            </CardBody>
           </Card>
         </div>
       );
     }
 
     return (
-      <Card style={{ width: '500px'}}>
+      <Card style={{ width: '500px' }}>
         <CardHeader>Game Not Found</CardHeader>
       </Card>
     );

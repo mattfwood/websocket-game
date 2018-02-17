@@ -17,6 +17,6 @@ const newUser = (users) => {
       return newId;
     }
   }
-}
+};
 
 module.exports = newUser;
