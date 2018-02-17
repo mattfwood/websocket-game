@@ -1,10 +1,16 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import Rock from '../rock.png';
-import Paper from '../paper.png';
-import Scissors from '../scissors.png';
-import { Card, Button } from 'reactstrap';
+import rock from '../rock.png';
+import paper from '../paper.png';
+import scissors from '../scissors.png';
+import { Alert, Card, Button, Row, Col, CardHeader, CardBody } from 'reactstrap';
+
+const icon = {
+  rock,
+  paper,
+  scissors
+};
 
 class PlayerView extends Component {
   constructor(props) {
@@ -27,7 +33,6 @@ class PlayerView extends Component {
     // console.log(playerIndex);
     // playerIndex: this.props.gameState.players.findIndex(player => player.id === this.state.currentPlayer)
     const playerIndex = this.props.gameState.players.findIndex(player => player.id === this.props.player);
-    console.log(playerIndex);
     this.setState({ playerIndex });
   }
 
@@ -67,19 +72,18 @@ class PlayerView extends Component {
       return (
         <div>
           Your Player ID: {player}
-          {JSON.stringify(gameState)}
           <div className="action-row">
             <img
               onClick={() => this.selectAction('rock')}
-              className="action" src={Rock}
+              className="action" src={icon.rock}
             />
             <img
               onClick={() => this.selectAction('paper')}
-              className="action" src={Paper}
+              className="action" src={icon.paper}
             />
             <img
               onClick={() => this.selectAction('scissors')}
-              className="action" src={Scissors}
+              className="action" src={icon.scissors}
             />
           </div>
           {
@@ -96,24 +100,79 @@ class PlayerView extends Component {
       );
     }
 
+    const playerOne = gameState.players[0];
+    const playerTwo = gameState.players[1];
+
+    const system = {
+      rock: 0,
+      paper: 1,
+      scissors: 2
+    };
+
+    const winnerMatrix = [
+      'Draw',
+      'Player Two',
+      'Player One',
+      'Player One',
+      'Draw',
+      'Player Two',
+      'Player Two',
+      'Player One',
+      'Draw'
+    ];
+
+    const winner = winnerMatrix[system[playerOne.action] * 3 + system[playerTwo.action]];
+
     // if both players are ready
     // post results to database and they'll be rendered
     return (
       <div>
-        BOTH PLAYERS READY
-        <Card>
-          Player 1 {gameState.players[0].id === this.props.player ? '(You)' : ''}
-          <br />
-          Picked: {gameState.players[0].action}
-        </Card>
-        <Card>
-          Player 2 {gameState.players[1].id}
-          <br />
-          Picked: {gameState.players[1].action}
-        </Card>
-        <Button color="primary" onClick={() => this.props.resetGame()}>
-          Reset Game
-        </Button>
+        <Row>
+          <Col>
+            <Card>
+              <CardHeader>
+                Player 1 {playerOne.id === this.props.player ? '(You)' : ''}
+              </CardHeader>
+              <CardBody className="d-flex flex-column align-items-center">
+                <img
+                  className="action" src={icon[playerOne.action]}
+                />
+                <div>
+                  {playerOne.action}
+                </div>
+              </CardBody>
+            </Card>
+          </Col>
+          <Col>
+            <Card>
+              <CardHeader>
+                Player 2 {playerTwo.id === this.props.player ? '(You)' : ''}
+              </CardHeader>
+              <CardBody className="d-flex flex-column align-items-center">
+                <img
+                  className="action" src={icon[playerTwo.action]}
+                />
+                <div>
+                  {playerTwo.action}
+                </div>
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+        <Row className="mt-3">
+          <Col>
+            <Alert color="primary">
+              {winner !== 'Draw' ? `${winner} Wins!` : 'Draw!' } 
+            </Alert>
+          </Col>
+        </Row>
+        <Row>
+          <Col className="d-flex justify-content-center mt-5">
+            <Button color="primary" onClick={() => this.props.resetGame()}>
+              Reset Game
+          </Button>
+          </Col>
+        </Row>
       </div>
     );
   }

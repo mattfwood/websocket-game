@@ -104,6 +104,8 @@ class Game extends Component {
       return player;
     });
 
+    console.log(gameState);
+
     this.setState({ gameState });
   }
 
