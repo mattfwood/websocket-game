@@ -3,13 +3,11 @@ import ReactDOM from 'react-dom';
 import 'react-notifications/lib/notifications.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import './index.css';
+import './App.css';
 import registerServiceWorker from './registerServiceWorker';
-import { NotificationContainer, NotificationManager } from 'react-notifications';
 
-import shortid from 'shortid';
 import {
   Container,
-  Button,
   Navbar,
   NavbarBrand,
   NavItem,
@@ -21,7 +19,6 @@ import {
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 
 import newUser from './helpers/newUser';
-import App from './App';
 import MainMenu from './components/MainMenu';
 import Game from './components/Game';
 import base from './base';
@@ -45,14 +42,13 @@ class Root extends Component {
   }
 
   componentWillMount() {
-    // this runs right before <App> is rendered
     this.ref = base.syncState('players', {
       context: this,
       state: 'players',
       asArray: true
     });
 
-    this.ref = base.syncState('games', {
+    this.ref = base.syncState('gameState', {
       context: this,
       state: 'games',
       asArray: true
@@ -102,98 +98,90 @@ class Root extends Component {
     const { games } = this.state;
     const id = haikunator.haikunate({ tokenLength: 0, delimiter: '-' });
 
-    games.push({
-      id,
-      players: [{
-        id: creator
-      }]
-    });
+    // games.push({
+    //   id,
+    //   players: [{
+    //     id: creator
+    //   }]
+    // });
 
-    this.setState({ games });
-  }
-
-  updateGames = (games) => {
-    this.setState({ games });
-  }
-
-  resetState = () => {
-    this.setState({
-      currentPlayer: '',
-      players: [],
-      games: []
-    });
-  }
-
-  toggleNavbar() {
-    this.setState({
-      collapsed: !this.state.collapsed
-    });
-  }
-
-  createNotification = (type) => {
-    console.log('creating notification...');
-    return () => {
-      switch (type) {
-        case 'info':
-          NotificationManager.info('Info message');
-          break;
-        case 'success':
-          NotificationManager.success('Success message', 'Title here');
-          break;
-        case 'warning':
-          NotificationManager.warning('Warning message', 'Close after 3000ms', 3000);
-          break;
-        case 'error':
-          NotificationManager.error('Error message', 'Click me!', 5000, () => {
-            alert('callback');
-          });
-          break;
+    base.post(`gameState/${id}`, {
+      data: {
+        id,
+        status: 'lobby',
+        turn: 0,
+        players: [{
+          id: creator,
+        }]
       }
-    };
-  };
+    })
+      .then(err => {
+      if (!err) {
+        console.log('game created')
+      }
+    });
 
-  render() {
-    return (
-      <Router>
-        <div>
-          <Navbar dark color="dark">
-            <NavbarBrand style={{ color: '#FFF' }}>
-              <Link to="/">Game</Link>
-            </NavbarBrand>
-            <NavItem>
-              Your ID: {this.state.currentPlayer}
-            </NavItem>
-            <NavbarToggler onClick={this.toggleNavbar} className="mr-2" />
-            <Collapse isOpen={!this.state.collapsed} navbar>
-              <Nav navbar>
-                <NavItem>
-                  <NavLink className="navbar-brand" onClick={() => this.resetState()}>Reset Game</NavLink>
-                </NavItem>
-              </Nav>
-            </Collapse>
-          </Navbar>
-          <Container className="mt-3">
-            <Route exact path="/" render={() => (
-              <div>
-                <MainMenu createGame={this.createGame} {...this.state} />
-              </div>
-            )} />
-            <Route path="/game/:id" render={(props) => (
-              <Game
-                updateGames={this.updateGames}
-                createNotification={this.createNotification}
-                {...this.state}
-                {...props}
-              />
-            )} />
-          </Container>
-          <NotificationContainer />
-        </div>
+  // this.setState({ games });
+}
 
-      </Router>
+updateGames = (games) => {
+  this.setState({ games });
+}
 
-    );
-  }
+resetState = () => {
+  this.setState({
+    currentPlayer: '',
+    players: [],
+    games: []
+  });
+}
+
+toggleNavbar() {
+  this.setState({
+    collapsed: !this.state.collapsed
+  });
+}
+
+render() {
+  return (
+    <Router>
+      <div>
+        <Navbar dark color="dark">
+          <NavbarBrand style={{ color: '#FFF' }}>
+            <Link to="/">Game</Link>
+          </NavbarBrand>
+          <div style={{ color: '#FFF' }}>
+            Your ID: {this.state.currentPlayer}
+          </div>
+          <NavbarToggler onClick={this.toggleNavbar} className="mr-2" />
+          <Collapse isOpen={!this.state.collapsed} navbar>
+            <Nav navbar>
+              <NavItem>
+                <NavLink className="navbar-brand" onClick={() => this.resetState()}>Reset Game</NavLink>
+              </NavItem>
+            </Nav>
+          </Collapse>
+        </Navbar>
+        <Container className="mt-3">
+          <Route exact path="/" render={() => (
+            <div>
+              <MainMenu createGame={this.createGame} {...this.state} />
+            </div>
+          )} />
+          <Route path="/game/:id" render={(props) => (
+            <Game
+              updateGames={this.updateGames}
+              {...this.state}
+              {...props}
+            />
+          )} />
+        </Container>
+      </div>
+
+    </Router>
+
+  );
+}
 }
 
 ReactDOM.render(<Root />, document.getElementById('root'));

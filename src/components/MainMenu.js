@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Col, Row, Button, ListGroup, ListGroupItem, Card, CardHeader, CardBody, CardTitle, CardText, InputGroup, Input } from 'reactstrap';
+import { Col, Row, Button, ListGroup, ListGroupItem, Card, CardHeader, CardBody, CardTitle, InputGroup } from 'reactstrap';
 import { Link } from 'react-router-dom';
 const Typeahead = require('react-typeahead').Typeahead;
 

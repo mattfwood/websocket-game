@@ -43,7 +43,7 @@ class PlayerView extends Component {
 
   componentWillReceiveProps(nextProps) {
     const { playerIndex, action } = this.state;
-    const { gameState, player } = nextProps;
+    const { gameState } = nextProps;
     const bothPlayersReady = (gameState) => {
       const playerStates = gameState.players.map(player => player.status);
       if (playerStates.includes('selecting')) {
@@ -58,7 +58,6 @@ class PlayerView extends Component {
   }
 
   render() {
-    const { playerIndex, action } = this.state;
     const { gameState, player } = this.props;
     const bothPlayersReady = (gameState) => {
       const playerStates = gameState.players.map(player => player.status);
@@ -77,18 +76,21 @@ class PlayerView extends Component {
               <img
                 onClick={() => this.selectAction('rock')}
                 className="action" src={icon.rock}
+                alt="rock"
               />
             </Col>
             <Col className="d-flex justify-content-center">
               <img
                 onClick={() => this.selectAction('paper')}
                 className="action" src={icon.paper}
+                alt="paper"
               />
             </Col>
             <Col className="d-flex justify-content-center">
               <img
                 onClick={() => this.selectAction('scissors')}
                 className="action" src={icon.scissors}
+                alt="scissors"
               />
             </Col>
           </Row>
@@ -142,6 +144,7 @@ class PlayerView extends Component {
               <CardBody className="d-flex flex-column align-items-center">
                 <img
                   className="action" src={icon[playerOne.action]}
+                  alt="Player one action"
                 />
                 <div>
                   {playerOne.action}
@@ -157,6 +160,7 @@ class PlayerView extends Component {
               <CardBody className="d-flex flex-column align-items-center">
                 <img
                   className="action" src={icon[playerTwo.action]}
+                  alt="Player two action"
                 />
                 <div>
                   {playerTwo.action}

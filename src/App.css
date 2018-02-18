@@ -79,3 +79,9 @@
 .player-1 {
   background-color: blue;
 }
+
+.action-button {
+  width: 100px;
+  height: 50px;
+  margin: 5px;
+}

@@ -2,29 +2,15 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import './App.css';
 
-// import KeyHandler, { KEYPRESS } from 'react-key-handler';
 import { Button, ListGroup, ListGroupItem, Card, CardHeader, CardBody, CardTitle, CardText } from 'reactstrap';
 
-import base from './base';
 import Level from './Level';
-// import Player from './Player';
-import shortid from 'shortid';
 import { Link } from 'react-router-dom';
 
 const Haikunator = require('haikunator');
 const haikunator = new Haikunator();
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-
-    // this.state = {
-    //   currentPlayer: '',
-    //   players: [],
-    //   games: []
-    // };
-  }
-
   createGame = (creator) => {
     const { games } = this.state;
     const id = haikunator.haikunate({tokenLength: 0, delimiter: '-'});

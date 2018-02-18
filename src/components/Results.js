@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { Alert, Card, Button, Row, Col, CardHeader, CardBody } from 'reactstrap';
+import React from 'react';
+import { Alert, Card, Row, Col, CardHeader, CardBody } from 'reactstrap';
 
 function Results(props) {
   const { gameState, currentPlayer, icon } = props;
@@ -37,6 +37,7 @@ function Results(props) {
             <CardBody className="d-flex flex-column align-items-center">
               <img
                 className="action" src={icon[playerOne.action]}
+                alt="Player One"
               />
               <div>
                 {playerOne.action}
@@ -52,6 +53,7 @@ function Results(props) {
             <CardBody className="d-flex flex-column align-items-center">
               <img
                 className="action" src={icon[playerTwo.action]}
+                alt="Player Two"
               />
               <div>
                 {playerTwo.action}

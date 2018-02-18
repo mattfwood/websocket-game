@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 function Player(props) {
-  const { player, id } = props;
+  const { player, index } = props;
   return (
     <div
-      className={`grid-square player-square player-${props.index}`}
+      className={`grid-square player-square player-${index}`}
       style={{
         left: `${player.position.x * 50}px`,
         top: `${player.position.y * 50}px`
@@ -16,7 +16,7 @@ function Player(props) {
 
 Player.propTypes = {
   playerIndex: PropTypes.number,
-  position: PropTypes.array,
+  position: PropTypes.object,
   id: PropTypes.number
 };
 
