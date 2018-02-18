@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Player from './Player';
 import { Col, Row, Button, ListGroup, ListGroupItem, Card, CardHeader, CardBody, CardTitle, CardText } from 'reactstrap';
 import PlayerView from './PlayerView';
 import Results from './Results';
@@ -24,6 +25,7 @@ class Game extends Component {
       gameState: {
         id: 'game',
         status: 'lobby',
+        turn: 0,
         players: []
       }
     };
@@ -68,15 +70,20 @@ class Game extends Component {
         data: {
           id: gameId,
           status: 'active',
+          turn: 0,
           players: [{
             id: playerOne,
-            status: 'selecting',
-            action: ''
+            position: {
+              x: 2,
+              y: 0
+            }
           },
           {
             id: playerTwo,
-            status: 'selecting',
-            action: ''
+            position: {
+              x: 2,
+              y: 4
+            }
           }]
         },
         then(err) {
@@ -106,13 +113,18 @@ class Game extends Component {
 
   resetGame = () => {
     let { gameState } = this.state;
-    gameState.players = gameState.players.map(player => {
-      player.action = '';
-      player.status = 'selecting';
-      return player;
-    });
 
-    console.log(gameState);
+    gameState.players[0].position = {
+      x: 2,
+      y: 0
+    }
+
+    gameState.players[1].position = {
+      x: 2,
+      y: 4
+    }
+
+    gameState.status = 'lobby';
 
     this.setState({ gameState });
   }
@@ -123,6 +135,110 @@ class Game extends Component {
     gameState.players[playerIndex].action = action;
     gameState.players[playerIndex].status = 'ready';
     this.setState({ gameState });
+  }
+
+  checkWinner = (gameState) => {
+    const { players } = gameState;
+    if (players[0].position.x > 4 ||
+      players[0].position.y > 4 ||
+      players[0].position.x < 0 ||
+      players[0].position.y < 0
+    ) {
+      alert('Player Two Wins');
+      gameState.status = 'ended';
+      this.setState({ gameState });
+    } else if (
+      players[1].position.x > 4 ||
+      players[1].position.y > 4 ||
+      players[1].position.x < 0 ||
+      players[1].position.y < 0
+    ) {
+      alert('Player One Wins');
+      gameState.status = 'ended';
+      this.setState({ gameState });
+    } else {
+      console.log('No Winner Decided');
+    }
+  }
+
+  checkCollision = (gameState, movingPlayer, direction) => {
+    const { players } = gameState;
+    const otherPlayer = movingPlayer === 0 ? 1 : 0;
+    if (players[0].position.x === players[1].position.x &&
+      players[0].position.y === players[1].position.y
+    ) {
+      console.log('COLLISION DETECTED');
+      // move both players in specified direction
+      switch (direction) {
+      case 'left':
+        // decrease player's X position by 1
+        // gameState.players[movingPlayer].position.x -= 1;
+        gameState.players[otherPlayer].position.x -= 1;
+        break;
+
+      case 'right':
+        // increase player's X position by 1
+        // gameState.players[movingPlayer].position.x += 1;
+        gameState.players[otherPlayer].position.x += 1;
+        break;
+
+      case 'up':
+        // increase player's Y position by 1
+        // gameState.players[movingPlayer].position.y -= 1;
+        gameState.players[otherPlayer].position.y -= 1;
+        break;
+
+      case 'down':
+        // decrease player's X position by 1
+        // gameState.players[movingPlayer].position.y += 1;
+        gameState.players[otherPlayer].position.y += 1;
+        break;
+
+      default:
+        console.log('error moving character');
+      }
+
+      this.setState({ gameState });
+    } else {
+      // if no collision, set game state normall
+      this.setState({ gameState });
+    }
+
+    this.checkWinner(gameState);
+  }
+
+  movePlayer = (direction, index) => {
+    const { gameState } = this.state;
+    switch (direction) {
+    case 'left':
+      // decrease player's X position by 1
+      gameState.players[index].position.x -= 1;
+      break;
+
+    case 'right':
+      // increase player's X position by 1
+      gameState.players[index].position.x += 1;
+      break;
+
+    case 'up':
+      // increase player's Y position by 1
+      gameState.players[index].position.y -= 1;
+      break;
+
+    case 'down':
+      // decrease player's X position by 1
+      gameState.players[index].position.y += 1;
+      break;
+
+    default:
+      console.log('player passed');
+    }
+
+    gameState.turn = gameState.turn === 0 ? 1 : 0;
+
+    this.checkCollision(gameState, index, direction);
+
+    // this.setState({ gameState });
   }
 
   render() {
@@ -140,7 +256,7 @@ class Game extends Component {
       return true;
     };
 
-    if (currentGame && status !== 'active') {
+    if (currentGame && status === 'lobby') {
       return (
         <Row>
           <Col>
@@ -166,7 +282,7 @@ class Game extends Component {
       );
     }
 
-    if (currentGame && status === 'active') {
+    if (currentGame && (status === 'active' || status === 'ended')) {
       return (
         <div className="view">
           <Card>
@@ -184,66 +300,83 @@ class Game extends Component {
             <CardBody>
               {
                 gameState.players.map((player, index) => {
-                  if (player.id === currentPlayer) {
-                    if (bothPlayersReady(gameState) === false) {
-                      return (
-                        <Row>
-                          <Col className="d-flex justify-content-center">
-                            <img
-                              onClick={() => this.selectAction(index, 'rock')}
-                              className="action" src={icon.rock}
-                            />
-                          </Col>
-                          <Col className="d-flex justify-content-center">
-                            <img
-                              onClick={() => this.selectAction(index, 'paper')}
-                              className="action" src={icon.paper}
-                            />
-                          </Col>
-                          <Col className="d-flex justify-content-center">
-                            <img
-                              onClick={() => this.selectAction(index, 'scissors')}
-                              className="action" src={icon.scissors}
-                            />
-                          </Col>
-                          {gameState.players[index].action && (
-                            <div className="text-center mt-5">
-                              <h4>
-                                You picked: {gameState.players[index].action}
-                              </h4>
-                              Waiting for other player to select...
-                            </div>)
-                          }
-                        </Row>
-                      );
-                    }
-                    // if both players are ready, show results screen
-                    return (
-                      <Results
-                        gameState={gameState}
-                        currentPlayer={currentPlayer}
-                        icon={icon}
-                      >
-                        <Row>
-                          <Col className="d-flex justify-content-center mt-5">
-                            <Button color="primary" onClick={() => this.resetGame()}>
-                              Reset Game
+                  const currentPlayersTurn = gameState.turn === index ? true : false;
+                  return (
+                    <Row className="grid-wrapper">
+                      {
+                        currentPlayersTurn && (
+                          <div>
+                            It's Your Turn!
+                          </div>
+                        )
+                      }
+                      {
+                        (player.id === currentPlayer) && (
+                          <div className="grid-container">
+                            {
+                              [...Array(25)].map(square =>
+                                <div className="grid-square" />
+                              )
+                            }
+                            {
+                              gameState.players.map((player, index) =>
+                                <Player player={player} index={index} />
+                              )
+                            }
+                          </div>
+                        )
+                      }
+                      {
+                        currentPlayersTurn && (player.id === currentPlayer) && status === 'active' && (
+                          <div>
+                            <Button
+                              onClick={() => this.movePlayer('up', index)}
+                              color="primary"
+                              disabled={player.position.y === 0}
+                            >
+                              Up
                             </Button>
-                          </Col>
-                        </Row>
-                      </Results>
-                    );
-                  }
-                  return null;
+                            <Button
+                              onClick={() => this.movePlayer('down', index)}
+                              color="primary"
+                              disabled={player.position.y === 4}
+                            >
+                              Down
+                            </Button>
+                            <Button
+                              onClick={() => this.movePlayer('left', index)}
+                              color="primary"
+                              disabled={player.position.x === 0}
+                            >
+                              Left
+                            </Button>
+                            <Button
+                              onClick={() => this.movePlayer('right', index)}
+                              color="primary"
+                              disabled={player.position.x === 4}
+                            >
+                              Right
+                            </Button>
+                            <Button
+                              onClick={() => this.movePlayer('pass', index)}
+                              color="primary"
+                            >
+                              Pass
+                            </Button>
+                          </div>
+                        )
+                      }
+                    </Row>
+                  );
                 })
               }
-              {/* <PlayerView
-                gameState={this.state.gameState}
-                player={this.props.currentPlayer}
-                playerReady={this.playerReady}
-                playerAction={this.playerAction}
-                resetGame={this.resetGame}
-              /> */}
+              {
+                status === 'ended' && (
+                  <Button color="primary" onClick={() => this.resetGame()}>
+                            Reset Game
+                  </Button>
+                )
+              }
             </CardBody>
           </Card>
         </div>

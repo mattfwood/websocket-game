@@ -48,3 +48,34 @@
 .copy-link-header {
   cursor: pointer;
 }
+
+.grid-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.grid-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  height: 250px;
+  width: 250px;
+  position: relative;
+}
+
+.grid-square {
+  border: 1px solid #222222;
+  height: 50px;
+  width: 50px;
+  transition: all 200ms ease;
+}
+
+.player-square {
+  background-color: red;
+  position: absolute;
+}
+
+.player-1 {
+  background-color: blue;
+}
