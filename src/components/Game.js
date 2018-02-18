@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, ListGroup, ListGroupItem, Card, CardHeader, CardBody, CardTitle, CardText } from 'reactstrap';
+import { Col, Row, Button, ListGroup, ListGroupItem, Card, CardHeader, CardBody, CardTitle, CardText } from 'reactstrap';
 import PlayerView from './PlayerView';
 import base from '../base';
 import Rock from '../rock.png';
@@ -117,33 +117,35 @@ class Game extends Component {
 
     if (currentGame && status !== 'active') {
       return (
-        <div className="view">
-          <Card style={{ width: '500px' }}>
-            <CardHeader>
-              {currentGame.id}
-            </CardHeader>
-            <ListGroup>
-              {currentGame && (
-                currentGame.players.map(player => {
-                  return (
-                    <ListGroupItem>{player.id}</ListGroupItem>
-                  );
-                })
-              )
-              }
-            </ListGroup>
-            <Button onClick={() => this.startGame(currentGame.players[0].id, currentGame.players[1].id)}>Start Game</Button>
-          </Card>
-        </div>
+        <Row>
+          <Col>
+            <Card>
+              <CardHeader>
+                {currentGame.id}
+              </CardHeader>
+              <ListGroup>
+                {currentGame && (
+                  currentGame.players.map(player => {
+                    return (
+                      <ListGroupItem>{player.id}</ListGroupItem>
+                    );
+                  })
+                )
+                }
+              </ListGroup>
+              <Button onClick={() => this.startGame(currentGame.players[0].id, currentGame.players[1].id)}>Start Game</Button>
+            </Card>
+          </Col>
+        </Row>
       );
     }
 
     if (currentGame && status === 'active') {
       return (
         <div className="view">
-          <Card style={{ width: '500px' }}>
+          <Card>
             <CardHeader>
-              Game Started: {currentGame.id} 
+              Game Started: {currentGame.id}
             </CardHeader>
             <CardBody>
               <PlayerView
@@ -160,7 +162,7 @@ class Game extends Component {
     }
 
     return (
-      <Card style={{ width: '500px' }}>
+      <Card>
         <CardHeader>Game Not Found</CardHeader>
       </Card>
     );

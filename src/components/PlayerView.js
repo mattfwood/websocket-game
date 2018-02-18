@@ -72,20 +72,26 @@ class PlayerView extends Component {
       return (
         <div>
           Your Player ID: {player}
-          <div className="action-row">
-            <img
-              onClick={() => this.selectAction('rock')}
-              className="action" src={icon.rock}
-            />
-            <img
-              onClick={() => this.selectAction('paper')}
-              className="action" src={icon.paper}
-            />
-            <img
-              onClick={() => this.selectAction('scissors')}
-              className="action" src={icon.scissors}
-            />
-          </div>
+          <Row>
+            <Col className="d-flex justify-content-center">
+              <img
+                onClick={() => this.selectAction('rock')}
+                className="action" src={icon.rock}
+              />
+            </Col>
+            <Col className="d-flex justify-content-center">
+              <img
+                onClick={() => this.selectAction('paper')}
+                className="action" src={icon.paper}
+              />
+            </Col>
+            <Col className="d-flex justify-content-center">
+              <img
+                onClick={() => this.selectAction('scissors')}
+                className="action" src={icon.scissors}
+              />
+            </Col>
+          </Row>
           {
             this.state.action && (
               <div className="text-center mt-5">
@@ -162,7 +168,7 @@ class PlayerView extends Component {
         <Row className="mt-3">
           <Col>
             <Alert color="primary">
-              {winner !== 'Draw' ? `${winner} Wins!` : 'Draw!' } 
+              {winner !== 'Draw' ? `${winner} Wins!` : 'Draw!'}
             </Alert>
           </Col>
         </Row>

@@ -5,11 +5,11 @@ body {
 }
 
 .view {
-  min-height: 100vh;
+  /* min-height: 100vh;
   display: flex;
   flex-direction: row;
   justify-content: center;
-  align-items: center;
+  align-items: center; */
 }
 
 .level-container {

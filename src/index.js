@@ -5,7 +5,17 @@ import './index.css';
 import registerServiceWorker from './registerServiceWorker';
 
 import shortid from 'shortid';
-import { Button, Nav, NavbarBrand, NavItem } from 'reactstrap';
+import {
+  Container,
+  Button,
+  Navbar,
+  NavbarBrand,
+  NavItem,
+  Collapse,
+  NavbarToggler,
+  Nav,
+  NavLink
+} from 'reactstrap';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 
 import newUser from './helpers/newUser';
@@ -14,6 +24,8 @@ import MainMenu from './components/MainMenu';
 import Game from './components/Game';
 import base from './base';
 
+require('disable-react-devtools');
+
 const Haikunator = require('haikunator');
 const haikunator = new Haikunator();
 
@@ -21,10 +33,12 @@ class Root extends Component {
   constructor(props) {
     super(props);
 
+    this.toggleNavbar = this.toggleNavbar.bind(this);
     this.state = {
       currentPlayer: '',
       players: [],
-      games: []
+      games: [],
+      collapsed: true
     };
   }
 
@@ -87,7 +101,7 @@ class Root extends Component {
 
   createGame = (creator) => {
     const { games } = this.state;
-    const id = haikunator.haikunate({tokenLength: 0, delimiter: '-'});
+    const id = haikunator.haikunate({ tokenLength: 0, delimiter: '-' });
 
     games.push({
       id,
@@ -111,31 +125,44 @@ class Root extends Component {
     });
   }
 
+  toggleNavbar() {
+    this.setState({
+      collapsed: !this.state.collapsed
+    });
+  }
+
   render() {
     return (
+
       <Router>
         <div>
-          <Nav>
-            <NavbarBrand>
-              Your ID: { this.state.currentPlayer }
+          <Navbar dark={true} color="dark">
+            <NavbarBrand style={{ color: '#FFF'}}>
+              Your ID: {this.state.currentPlayer}
             </NavbarBrand>
-            <NavItem>
-              <Button onClick={() => this.resetState()}>
-                Reset
-              </Button>
-            </NavItem>
-          </Nav>
-
-          <Route exact path="/" render={() => (
-            <div>
-              <MainMenu createGame={this.createGame} {...this.state}/>
-            </div>
-          )}/>
-          <Route path="/game/:id" render={(props) => (
-            <Game updateGames={this.updateGames} {...this.state} {...props}/>
-          )}/>
+            <NavbarToggler onClick={this.toggleNavbar} className="mr-2" />
+            <Collapse isOpen={!this.state.collapsed} navbar>
+              <Nav navbar>
+                <NavItem>
+                  <NavLink className="navbar-brand" onClick={() => this.resetState()}>Reset Game</NavLink>
+                </NavItem>
+              </Nav>
+            </Collapse>
+          </Navbar>
+          <Container className="mt-3">
+            <Route exact path="/" render={() => (
+              <div>
+                <MainMenu createGame={this.createGame} {...this.state} />
+              </div>
+            )} />
+            <Route path="/game/:id" render={(props) => (
+              <Game updateGames={this.updateGames} {...this.state} {...props} />
+            )} />
+          </Container>
         </div>
+
       </Router>
+
     );
   }
 }
