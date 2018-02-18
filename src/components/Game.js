@@ -1,10 +1,19 @@
 import React, { Component } from 'react';
 import { Col, Row, Button, ListGroup, ListGroupItem, Card, CardHeader, CardBody, CardTitle, CardText } from 'reactstrap';
 import PlayerView from './PlayerView';
+import Results from './Results';
 import base from '../base';
-import Rock from '../rock.png';
-import Paper from '../paper.png';
-import Scissors from '../scissors.png';
+import rock from '../rock.png';
+import paper from '../paper.png';
+import scissors from '../scissors.png';
+import clipboard from '../clippy.svg';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+
+const icon = {
+  rock,
+  paper,
+  scissors
+};
 
 class Game extends Component {
   constructor(props) {
@@ -35,7 +44,6 @@ class Game extends Component {
     if (games.length > 0) {
       games = games.map(game => {
         if (game.id === gameId) {
-          ;
           const playerIndex = game.players.findIndex(player => player.id === currentPlayer);
           // if player isn't already in game, add them
           if (playerIndex === -1) {
@@ -109,11 +117,28 @@ class Game extends Component {
     this.setState({ gameState });
   }
 
+  selectAction = (playerIndex, action) => {
+    const { gameState } = this.state;
+
+    gameState.players[playerIndex].action = action;
+    gameState.players[playerIndex].status = 'ready';
+    this.setState({ gameState });
+  }
+
   render() {
-    const { status } = this.state.gameState;
-    const { games } = this.props;
+    const { gameState } = this.state;
+    const { status } = gameState;
+    const { games, currentPlayer } = this.props;
     const gameId = this.props.match.params.id;
     const currentGame = games.filter(game => game.id === gameId)[0];
+
+    const bothPlayersReady = (gameState) => {
+      const playerStates = gameState.players.map(player => player.status);
+      if (playerStates.includes('selecting')) {
+        return false;
+      }
+      return true;
+    };
 
     if (currentGame && status !== 'active') {
       return (
@@ -122,6 +147,7 @@ class Game extends Component {
             <Card>
               <CardHeader>
                 {currentGame.id}
+                <img src={clipboard} />
               </CardHeader>
               <ListGroup>
                 {currentGame && (
@@ -144,17 +170,80 @@ class Game extends Component {
       return (
         <div className="view">
           <Card>
-            <CardHeader>
-              Game Started: {currentGame.id}
+            <CardHeader className="copy-link-header">
+              <CopyToClipboard
+                text={`${window.location.origin}/game/${currentGame.id}`}
+                onCopy={() => this.props.createNotification('success')}
+              >
+                <div>
+                  Game Started: {currentGame.id}
+                  <img src={clipboard} className="clipboard-icon" />
+                </div>
+              </CopyToClipboard>
             </CardHeader>
             <CardBody>
-              <PlayerView
+              {
+                gameState.players.map((player, index) => {
+                  if (player.id === currentPlayer) {
+                    if (bothPlayersReady(gameState) === false) {
+                      return (
+                        <Row>
+                          <Col className="d-flex justify-content-center">
+                            <img
+                              onClick={() => this.selectAction(index, 'rock')}
+                              className="action" src={icon.rock}
+                            />
+                          </Col>
+                          <Col className="d-flex justify-content-center">
+                            <img
+                              onClick={() => this.selectAction(index, 'paper')}
+                              className="action" src={icon.paper}
+                            />
+                          </Col>
+                          <Col className="d-flex justify-content-center">
+                            <img
+                              onClick={() => this.selectAction(index, 'scissors')}
+                              className="action" src={icon.scissors}
+                            />
+                          </Col>
+                          {gameState.players[index].action && (
+                            <div className="text-center mt-5">
+                              <h4>
+                                You picked: {gameState.players[index].action}
+                              </h4>
+                              Waiting for other player to select...
+                            </div>)
+                          }
+                        </Row>
+                      );
+                    }
+                    // if both players are ready, show results screen
+                    return (
+                      <Results
+                        gameState={gameState}
+                        currentPlayer={currentPlayer}
+                        icon={icon}
+                      >
+                        <Row>
+                          <Col className="d-flex justify-content-center mt-5">
+                            <Button color="primary" onClick={() => this.resetGame()}>
+                              Reset Game
+                            </Button>
+                          </Col>
+                        </Row>
+                      </Results>
+                    );
+                  }
+                  return null;
+                })
+              }
+              {/* <PlayerView
                 gameState={this.state.gameState}
                 player={this.props.currentPlayer}
                 playerReady={this.playerReady}
                 playerAction={this.playerAction}
                 resetGame={this.resetGame}
-              />
+              /> */}
             </CardBody>
           </Card>
         </div>

@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import 'react-notifications/lib/notifications.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import './index.css';
 import registerServiceWorker from './registerServiceWorker';
+import { NotificationContainer, NotificationManager } from 'react-notifications';
 
 import shortid from 'shortid';
 import {
@@ -85,10 +87,7 @@ class Root extends Component {
       base.push('players', {
         data: {
           id,
-          position: {
-            top: 0,
-            left: 0
-          }
+          name: ''
         },
         then(err) {
           if (!err) {
@@ -131,15 +130,39 @@ class Root extends Component {
     });
   }
 
+  createNotification = (type) => {
+    console.log('creating notification...');
+    return () => {
+      switch (type) {
+        case 'info':
+          NotificationManager.info('Info message');
+          break;
+        case 'success':
+          NotificationManager.success('Success message', 'Title here');
+          break;
+        case 'warning':
+          NotificationManager.warning('Warning message', 'Close after 3000ms', 3000);
+          break;
+        case 'error':
+          NotificationManager.error('Error message', 'Click me!', 5000, () => {
+            alert('callback');
+          });
+          break;
+      }
+    };
+  };
+
   render() {
     return (
-
       <Router>
         <div>
-          <Navbar dark={true} color="dark">
-            <NavbarBrand style={{ color: '#FFF'}}>
-              Your ID: {this.state.currentPlayer}
+          <Navbar dark color="dark">
+            <NavbarBrand style={{ color: '#FFF' }}>
+              <Link to="/">Game</Link>
             </NavbarBrand>
+            <NavItem>
+              Your ID: {this.state.currentPlayer}
+            </NavItem>
             <NavbarToggler onClick={this.toggleNavbar} className="mr-2" />
             <Collapse isOpen={!this.state.collapsed} navbar>
               <Nav navbar>
@@ -156,9 +179,15 @@ class Root extends Component {
               </div>
             )} />
             <Route path="/game/:id" render={(props) => (
-              <Game updateGames={this.updateGames} {...this.state} {...props} />
+              <Game
+                updateGames={this.updateGames}
+                createNotification={this.createNotification}
+                {...this.state}
+                {...props}
+              />
             )} />
           </Container>
+          <NotificationContainer />
         </div>
 
       </Router>
