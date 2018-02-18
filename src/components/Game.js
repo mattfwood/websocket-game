@@ -32,10 +32,10 @@ class Game extends Component {
   }
 
   componentDidMount() {
-    console.log(this);
     const { gameState } = this.state;
     const { currentPlayer } = this.props;
-    const gameId = this.props.match.params.id;
+    // console.log('CURRENT PLAYER:' + currentPlayer)
+    // const gameId = this.props.match.params.id;
 
     gameState.players.forEach(player => {
       const playerIndex = gameState.players.findIndex(player => player.id === currentPlayer);
@@ -46,7 +46,7 @@ class Game extends Component {
         gameState.players.push({ id: currentPlayer });
         this.setState({ gameState });
       }
-    })
+    });
 
     // if (games.length > 0) {
     //   games = games.map(game => {
@@ -69,6 +69,31 @@ class Game extends Component {
     //   console.log(games);
     //   this.props.updateGames(games);
     // }
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    console.log('COMPONENT UPDATED', nextProps, nextState);
+
+    // if (nextState.gameState.players.length)
+    // debugger
+
+    const { gameState } = nextState;
+    const { currentPlayer } = nextProps;
+
+
+
+    gameState.players.forEach(player => {
+      const playerIndex = gameState.players.findIndex(player => player.id === currentPlayer);
+
+      // if player doesn't exist in current game, add them
+      if (playerIndex === -1) {
+        alert('new player found');
+        gameState.players.push({ id: currentPlayer });
+        this.setState({ gameState });
+      }
+    });
+
+    return false;
   }
 
   startGame = (playerOne, playerTwo) => {
@@ -97,7 +122,7 @@ class Game extends Component {
         },
         then(err) {
           if (!err) {
-            console.log('game started');
+            // console.log('game started');
           }
         }
       });
@@ -114,7 +139,7 @@ class Game extends Component {
   }
 
   playerAction = (playerIndex, action) => {
-    console.log(playerIndex, action);
+    // console.log(playerIndex, action);
     const { gameState } = this.state;
     gameState.players[playerIndex].action = action;
     this.setState({ gameState });
@@ -166,7 +191,7 @@ class Game extends Component {
       gameState.status = 'ended';
       this.setState({ gameState });
     } else {
-      console.log('No Winner Decided');
+      // console.log('No Winner Decided');
     }
   }
 
@@ -176,7 +201,7 @@ class Game extends Component {
     if (players[0].position.x === players[1].position.x &&
       players[0].position.y === players[1].position.y
     ) {
-      console.log('COLLISION DETECTED');
+      // console.log('COLLISION DETECTED');
       // move both players in specified direction
       switch (direction) {
         case 'left':
@@ -204,7 +229,7 @@ class Game extends Component {
           break;
 
         default:
-          console.log('error moving character');
+          // console.log('error moving character');
       }
 
       this.setState({ gameState });
@@ -240,7 +265,7 @@ class Game extends Component {
         break;
 
       default:
-        console.log('player passed');
+        // console.log('player passed');
     }
 
     gameState.turn = gameState.turn === 0 ? 1 : 0;
@@ -251,10 +276,11 @@ class Game extends Component {
   }
 
   render() {
+    console.log(this.state);
     const { gameState } = this.state;
     const { status } = gameState;
     const { currentPlayer } = this.props;
-    const gameId = this.props.match.params.id;
+    // const gameId = this.props.match.params.id;
 
     if (status === 'lobby') {
       return (
@@ -264,7 +290,6 @@ class Game extends Component {
               <CardHeader className="copy-link-header">
                 <CopyToClipboard
                   text={`${window.location.origin}/game/${gameState.id}`}
-                  onCopy={() => this.props.createNotification('success')}
                 >
                   <div>
                     {gameState.id}

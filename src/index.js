@@ -95,7 +95,7 @@ class Root extends Component {
   }
 
   createGame = (creator) => {
-    const { games } = this.state;
+    // const { games } = this.state;
     const id = haikunator.haikunate({ tokenLength: 0, delimiter: '-' });
 
     // games.push({
