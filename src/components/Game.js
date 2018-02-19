@@ -37,16 +37,16 @@ class Game extends Component {
     // console.log('CURRENT PLAYER:' + currentPlayer)
     // const gameId = this.props.match.params.id;
 
-    gameState.players.forEach(player => {
-      const playerIndex = gameState.players.findIndex(player => player.id === currentPlayer);
+    // gameState.players.forEach(player => {
+    //   const playerIndex = gameState.players.findIndex(player => player.id === currentPlayer);
 
-      // if player doesn't exist in current game, add them
-      if (playerIndex === -1) {
-        alert('new player found');
-        gameState.players.push({ id: currentPlayer });
-        this.setState({ gameState });
-      }
-    });
+    //   // if player doesn't exist in current game, add them
+    //   if (playerIndex === -1) {
+    //     alert('new player found');
+    //     gameState.players.push({ id: currentPlayer });
+    //     this.setState({ gameState });
+    //   }
+    // });
 
     // if (games.length > 0) {
     //   games = games.map(game => {
@@ -87,13 +87,14 @@ class Game extends Component {
 
       // if player doesn't exist in current game, add them
       if (playerIndex === -1) {
-        alert('new player found');
+        // alert('new player found');
+        console.log('new player found');
         gameState.players.push({ id: currentPlayer });
         this.setState({ gameState });
       }
     });
 
-    return false;
+    return true;
   }
 
   startGame = (playerOne, playerTwo) => {
@@ -157,6 +158,11 @@ class Game extends Component {
       x: 2,
       y: 4
     }
+
+    // gameState.players[2].position = {
+    //   x: 2,
+    //   y: 4
+    // }
 
     gameState.status = 'lobby';
 
@@ -337,7 +343,7 @@ class Game extends Component {
                       {currentPlayersTurn && (player.id === currentPlayer) &&
                         <Alert color={index === 1 ? "primary" : "danger"}>
                           It's Your Turn!
-                      </Alert>
+                        </Alert>
                       }
                       <Row className="grid-wrapper">
                         {

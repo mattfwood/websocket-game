@@ -130,7 +130,6 @@ updateGames = (games) => {
 
 resetState = () => {
   this.setState({
-    currentPlayer: '',
     players: [],
     games: []
   });

@@ -81,7 +81,7 @@
 }
 
 .action-button {
-  width: 100px;
+  width: 100%;
   height: 50px;
-  margin: 5px;
+  margin: 5px 0;
 }
