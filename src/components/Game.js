@@ -97,29 +97,59 @@ class Game extends Component {
     return true;
   }
 
-  startGame = (playerOne, playerTwo) => {
+  startGame = (currentPlayers) => {
     const gameId = this.props.match.params.id;
 
-    if (playerOne && playerTwo && gameId) {
+    const players = currentPlayers.map((player, index) => {
+      let position;
+
+      switch(index) {
+        case 0:
+          position = {
+            x: 2,
+            y: 0,
+          }
+          break;
+        case 1:
+          position = {
+            x: 2,
+            y: 4,
+          }
+          break;
+        case 2:
+          position = {
+            x: 0,
+            y: 2
+          }
+          break;
+        case 3:
+          position = {
+            x: 4,
+            y: 2
+          }
+          break;
+        default:
+          break;
+          
+      }
+
+      return {
+        id: player.id,
+        position
+      }
+    });
+
+    console.log(players);
+
+    debugger
+
+    if (players.length > 2 && gameId) {
       base.post(`gameState/${gameId}`, {
         data: {
           id: gameId,
           status: 'active',
           turn: 0,
-          players: [{
-            id: playerOne,
-            position: {
-              x: 2,
-              y: 0
-            }
-          },
-          {
-            id: playerTwo,
-            position: {
-              x: 2,
-              y: 4
-            }
-          }]
+          players
         },
         then(err) {
           if (!err) {
@@ -319,7 +349,7 @@ class Game extends Component {
             <Button
               color="primary"
               className="mt-3"
-              onClick={() => this.startGame(gameState.players[0].id, gameState.players[1].id)}
+              onClick={() => this.startGame(gameState.players)}
               disabled={gameState.players.length < 2}
               block
             >
