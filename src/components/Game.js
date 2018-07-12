@@ -128,6 +128,8 @@ class Game extends Component {
         const { y, x } = position;
 
         // const newX = Number((y + e.gamma / 10).toFixed(2));
+        // y: Math.round((y + e.gamma / 10) * 10) / 10,
+        // x: Math.round((x + e.beta / 10) * 10) / 10,
 
         const newPosition = {
           y: Number((y + e.gamma / 10).toFixed(1)),
