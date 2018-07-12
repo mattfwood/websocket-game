@@ -109,23 +109,29 @@ class Game extends Component {
   }
 
   handleOrientation = e => {
-    if (this.state.gameState.status === 'active' || this.state.gameState.status === 'ended') {
-
+    if (
+      this.state.gameState.status === 'active' ||
+      this.state.gameState.status === 'ended'
+    ) {
       const playerId = window.localStorage.getItem('websocket-game-id');
       const maxX = 300 - 20;
       const maxY = 300 - 20;
       const { players } = this.state.gameState;
 
-      const currentPlayerIndex = players.findIndex(player => player.id === playerId);
+      const currentPlayerIndex = players.findIndex(
+        player => player.id === playerId
+      );
 
       if (currentPlayerIndex !== -1) {
         // get current players position
         const { position } = players[currentPlayerIndex];
         const { y, x } = position;
 
+        // const newX = Number((y + e.gamma / 10).toFixed(2));
+
         const newPosition = {
-          y: y + (e.gamma / 10),
-          x: x + (e.beta / 10),
+          y: Number((y + e.gamma / 10).toFixed(1)),
+          x: Number((x + e.beta / 10).toFixed(1)),
         };
 
         if (
@@ -140,7 +146,7 @@ class Game extends Component {
 
           this.setState({
             gameState: {
-              players
+              players,
             },
           });
         }
@@ -148,7 +154,6 @@ class Game extends Component {
         console.log({ playerId, e });
       }
     }
-
   };
 
   startGame = (playerOne, playerTwo) => {
