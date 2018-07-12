@@ -20,8 +20,6 @@ class Game extends Component {
         players: []
       }
     };
-
-    this.playerAction = this.playerAction.bind(this);
   }
 
   componentWillMount() {
@@ -54,7 +52,7 @@ class Game extends Component {
     //       const playerIndex = game.players.findIndex(player => player.id === currentPlayer);
     //       // if player isn't already in game, add them
     //       const { gameState } = this.state;
-    //       // if there are already players in the game, set state to a new array with 
+    //       // if there are already players in the game, set state to a new array with
     //         if (playerIndex === -1) {
     //           gameState.players.push({ id: currentPlayer });
     //           this.setState({ gameState });
