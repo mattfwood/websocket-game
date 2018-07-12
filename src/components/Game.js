@@ -1,9 +1,21 @@
 import React, { Component } from 'react';
 import Player from './Player';
-import { Alert, Col, Row, Button, ListGroup, ListGroupItem, Card, CardHeader, CardBody } from 'reactstrap';
+import {
+  Alert,
+  Col,
+  Row,
+  Button,
+  ListGroup,
+  ListGroupItem,
+  Card,
+  CardHeader,
+  CardBody,
+} from 'reactstrap';
 import base from '../base';
 import clipboard from '../clippy.svg';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import Field from './Field';
+import Ball from './Ball';
 
 const FontAwesome = require('react-fontawesome');
 
@@ -17,21 +29,22 @@ class Game extends Component {
         id: 'game',
         status: 'lobby',
         turn: 0,
-        players: []
-      }
+        players: [],
+      },
     };
   }
 
   componentWillMount() {
     this.ref = base.syncState(`gameState/${this.props.match.params.id}`, {
       context: this,
-      state: 'gameState'
+      state: 'gameState',
     });
   }
 
   componentDidMount() {
     const { gameState } = this.state;
     const { currentPlayer } = this.props;
+    window.addEventListener('deviceorientation', this.handleOrientation);
     // console.log('CURRENT PLAYER:' + currentPlayer)
     // const gameId = this.props.match.params.id;
 
@@ -78,10 +91,10 @@ class Game extends Component {
     const { gameState } = nextState;
     const { currentPlayer } = nextProps;
 
-
-
     gameState.players.forEach(player => {
-      const playerIndex = gameState.players.findIndex(player => player.id === currentPlayer);
+      const playerIndex = gameState.players.findIndex(
+        player => player.id === currentPlayer
+      );
 
       // if player doesn't exist in current game, add them
       if (playerIndex === -1) {
@@ -95,6 +108,49 @@ class Game extends Component {
     return true;
   }
 
+  handleOrientation = e => {
+    if (this.state.gameState.status === 'active' || this.state.gameState.status === 'ended') {
+
+      const playerId = window.localStorage.getItem('websocket-game-id');
+      const maxX = 300 - 20;
+      const maxY = 300 - 20;
+      const { players } = this.state.gameState;
+
+      const currentPlayerIndex = players.findIndex(player => player.id === playerId);
+
+      if (currentPlayerIndex !== -1) {
+        // get current players position
+        const { position } = players[currentPlayerIndex];
+        const { y, x } = position;
+
+        const newPosition = {
+          y: y + (e.gamma / 10),
+          x: x + (e.beta / 10),
+        };
+
+        if (
+          newPosition.y > maxY ||
+          newPosition.y < 0 ||
+          newPosition.x > maxX ||
+          newPosition.x < 0
+        ) {
+          // do nothing
+        } else {
+          players[currentPlayerIndex].position = newPosition;
+
+          this.setState({
+            gameState: {
+              players
+            },
+          });
+        }
+
+        console.log({ playerId, e });
+      }
+    }
+
+  };
+
   startGame = (playerOne, playerTwo) => {
     const gameId = this.props.match.params.id;
 
@@ -104,58 +160,60 @@ class Game extends Component {
           id: gameId,
           status: 'active',
           turn: 0,
-          players: [{
-            id: playerOne,
-            position: {
-              x: 2,
-              y: 0
-            }
-          },
-          {
-            id: playerTwo,
-            position: {
-              x: 2,
-              y: 4
-            }
-          }]
+          players: [
+            {
+              id: playerOne,
+              position: {
+                x: 150,
+                y: 150,
+              },
+            },
+            {
+              id: playerTwo,
+              position: {
+                x: 150,
+                y: 150,
+              },
+            },
+          ],
         },
         then(err) {
           if (!err) {
             // console.log('game started');
           }
-        }
+        },
       });
     } else {
       console.log('You need two players to start');
       alert('Two players required');
     }
-  }
+  };
 
-  playerReady = (playerIndex) => {
+  playerReady = playerIndex => {
     const { gameState } = this.state;
     gameState.players[playerIndex].status = 'ready';
     this.setState({ gameState });
-  }
+  };
 
   playerAction = (playerIndex, action) => {
     // console.log(playerIndex, action);
     const { gameState } = this.state;
     gameState.players[playerIndex].action = action;
     this.setState({ gameState });
-  }
+  };
 
   resetGame = () => {
     let { gameState } = this.state;
 
     gameState.players[0].position = {
       x: 2,
-      y: 0
-    }
+      y: 0,
+    };
 
     gameState.players[1].position = {
       x: 2,
-      y: 4
-    }
+      y: 4,
+    };
 
     // gameState.players[2].position = {
     //   x: 2,
@@ -165,7 +223,7 @@ class Game extends Component {
     gameState.status = 'lobby';
 
     this.setState({ gameState });
-  }
+  };
 
   selectAction = (playerIndex, action) => {
     const { gameState } = this.state;
@@ -173,11 +231,12 @@ class Game extends Component {
     gameState.players[playerIndex].action = action;
     gameState.players[playerIndex].status = 'ready';
     this.setState({ gameState });
-  }
+  };
 
-  checkWinner = (gameState) => {
+  checkWinner = gameState => {
     const { players } = gameState;
-    if (players[0].position.x > 4 ||
+    if (
+      players[0].position.x > 4 ||
       players[0].position.y > 4 ||
       players[0].position.x < 0 ||
       players[0].position.y < 0
@@ -197,12 +256,13 @@ class Game extends Component {
     } else {
       // console.log('No Winner Decided');
     }
-  }
+  };
 
   checkCollision = (gameState, movingPlayer, direction) => {
     const { players } = gameState;
     const otherPlayer = movingPlayer === 0 ? 1 : 0;
-    if (players[0].position.x === players[1].position.x &&
+    if (
+      players[0].position.x === players[1].position.x &&
       players[0].position.y === players[1].position.y
     ) {
       // console.log('COLLISION DETECTED');
@@ -233,7 +293,7 @@ class Game extends Component {
           break;
 
         default:
-          // console.log('error moving character');
+        // console.log('error moving character');
       }
 
       this.setState({ gameState });
@@ -243,7 +303,7 @@ class Game extends Component {
     }
 
     this.checkWinner(gameState);
-  }
+  };
 
   movePlayer = (direction, index) => {
     const { gameState } = this.state;
@@ -269,7 +329,7 @@ class Game extends Component {
         break;
 
       default:
-        // console.log('player passed');
+      // console.log('player passed');
     }
 
     gameState.turn = gameState.turn === 0 ? 1 : 0;
@@ -277,7 +337,7 @@ class Game extends Component {
     this.checkCollision(gameState, index, direction);
 
     // this.setState({ gameState });
-  }
+  };
 
   render() {
     console.log(this.state);
@@ -297,27 +357,27 @@ class Game extends Component {
                 >
                   <div>
                     {gameState.id}
-                    <img src={clipboard} className="clipboard-icon"
+                    <img
+                      src={clipboard}
+                      className="clipboard-icon"
                       alt="Copy to Clipboard"
                     />
                   </div>
                 </CopyToClipboard>
               </CardHeader>
               <ListGroup>
-                {gameState && (
+                {gameState &&
                   gameState.players.map(player => {
-                    return (
-                      <ListGroupItem>{player.id}</ListGroupItem>
-                    );
-                  })
-                )
-                }
+                    return <ListGroupItem>{player.id}</ListGroupItem>;
+                  })}
               </ListGroup>
             </Card>
             <Button
               color="primary"
               className="mt-3"
-              onClick={() => this.startGame(gameState.players[0].id, gameState.players[1].id)}
+              onClick={() =>
+                this.startGame(gameState.players[0].id, gameState.players[1].id)
+              }
               disabled={gameState.players.length < 2}
               block
             >
@@ -333,111 +393,17 @@ class Game extends Component {
         <div className="view">
           <Card>
             <CardBody>
-              {
-                gameState.players.map((player, index) => {
-                  const currentPlayersTurn = gameState.turn === index ? true : false;
-                  return (
-                    <div>
-                      {currentPlayersTurn && (player.id === currentPlayer) &&
-                        <Alert color={index === 1 ? "primary" : "danger"}>
-                          It's Your Turn!
-                        </Alert>
-                      }
-                      <Row className="grid-wrapper">
-                        {
-                          player.id === currentPlayer && (
-                            <div className="grid-container">
-                              {
-                                [...Array(25)].map(square =>
-                                  <div className="grid-square" />
-                                )
-                              }
-                              {
-                                gameState.players.map((player, index) =>
-                                  <Player player={player} index={index} />
-                                )
-                              }
-                            </div>
-                          )
-                        }
-                        {
-                          currentPlayersTurn && (player.id === currentPlayer) && status === 'active' && (
-                            <Col className="mt-4" xs="12">
-                              <Row>
-                                <Col />
-                                <Col>
-                                  <Button
-                                    className="action-button"
-                                    onClick={() => this.movePlayer('up', index)}
-                                    color="primary"
-                                    disabled={player.position.y === 0}
-                                  >
-                                    <FontAwesome size="2x" name="chevron-circle-up" />
-                                </Button>
-                                </Col>
-                                <Col />
-                              </Row>
-                              <Row>
-                                <Col>
-                                  <Button
-                                    className="action-button"
-                                    onClick={() => this.movePlayer('left', index)}
-                                    color="primary"
-                                    disabled={player.position.x === 0}
-                                  >
-                                    <FontAwesome size="2x" name="chevron-circle-left" />
-                                </Button>
-                                </Col>
-                                <Col>
-                                  <Button
-                                    className="action-button"
-                                    onClick={() => this.movePlayer('pass', index)}
-                                    color="primary"
-                                  >
-                                    Pass
-                                  </Button>
-                                </Col>
-                                <Col>
-                                  <Button
-                                    className="action-button"
-                                    onClick={() => this.movePlayer('right', index)}
-                                    color="primary"
-                                    disabled={player.position.x === 4}
-                                  >
-                                    <FontAwesome size="2x" name="chevron-circle-right" />
-                                  </Button>
-                                </Col>
-                              </Row>
-                              <Row>
-                                <Col />
-                                <Col>
-                                  <Button
-                                    className="action-button"
-                                    onClick={() => this.movePlayer('down', index)}
-                                    color="primary"
-                                    disabled={player.position.y === 4}
-                                  >
-                                    <FontAwesome size="2x" name="chevron-circle-down" />
-                                </Button>
-                                </Col>
-                                <Col />
-                              </Row>
-
-                            </Col>
-                          )
-                        }
-                      </Row>
-                    </div>
-                  );
-                })
-              }
-              {
-                status === 'ended' && (
-                  <Button color="primary" onClick={() => this.resetGame()}>
-                    Reset Game
-                  </Button>
-                )
-              }
+              <Field>
+                <div>Player</div>
+              </Field>
+              {gameState.players.map((player, index) => (
+                <Ball top={player.position.x} left={player.position.y} />
+              ))}
+              {/* {status === 'ended' && (
+                <Button color="primary" onClick={() => this.resetGame()}>
+                  Reset Game
+                </Button>
+              )} */}
             </CardBody>
           </Card>
         </div>
